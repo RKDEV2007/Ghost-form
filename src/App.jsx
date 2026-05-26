@@ -1,14 +1,21 @@
 import { useState } from 'react'
+import { Header } from './components/Header'
+import { Sidebar } from './components/Sidebar'
+import { Workspace } from './components/Workspace'
+import { MissionPanel } from './components/MissionPanel'
+import { INITIAL_LOGS } from './data/logs'
 
-import './App.css'
-
-function App() {
+export default function App() {
+  const [activeView, setActiveView] = useState('form')
 
   return (
-    <>
-      <h1>Hello World</h1>
-    </>
+    <div className="screen">
+      <Header />
+      <div className="layout">
+        <Sidebar activeView={activeView} onView={setActiveView} />
+        <Workspace activeView={activeView} logs={INITIAL_LOGS} />
+        <MissionPanel />
+      </div>
+    </div>
   )
 }
-
-export default App
