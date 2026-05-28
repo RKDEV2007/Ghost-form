@@ -1,32 +1,37 @@
-import { useState } from 'react'
-import { Header } from './components/Header'
-import { Sidebar } from './components/Sidebar'
-import { Workspace } from './components/Workspace'
-import { MissionPanel } from './components/MissionPanel'
+import { GameProvider } from './game/GameContext'
+import { useGame } from './game/useGame'
+import { SCREENS } from './game/constants'
+import { createInitialState } from './game/initialState'
 import { TitleScreen } from './components/TitleScreen'
-import { IntroScreen } from './components/IntroScreen'
-import { DialoguePanel } from './components/DialoguePanel'
-import { ActivityFeed } from './components/ActivityFeed'
-import { INITIAL_LOGS } from './data/logs'
+import { IntroVN } from './components/IntroVN'
+import { GameScreen } from './components/GameScreen'
+import { EndingScreen } from './components/EndingScreen'
+import './styles/game.css'
 
-export default function App() {
-  const [screen, setScreen] = useState('title')
-  const [activeView, setActiveView] = useState('log')
+function GameRouter() {
+  const { state, setState } = useGame()
 
-  if (screen === 'title') return <TitleScreen onStart={() => setScreen('intro')} />
-  if (screen === 'intro') return <IntroScreen onDone={() => setScreen('game')} />
+  if (state.screen === SCREENS.TITLE) return <TitleScreen />
+  if (state.screen === SCREENS.INTRO) return <IntroVN />
+  if (state.screen === SCREENS.ENDING) {
+    return (
+      <EndingScreen
+        ending={state.ending ?? state.flags.finalChoice ?? 'contain'}
+        onRestart={() => setState(createInitialState())}
+      />
+    )
+  }
+  return <GameScreen />
+}
 
+function App() {
   return (
-    <div className="screen">
-      <Header />
-      <div className="layout">
-        <Sidebar activeView={activeView} onView={setActiveView} />
-        <main>
-          <div className="scene-grid"><DialoguePanel /><ActivityFeed /></div>
-          <Workspace activeView={activeView} logs={INITIAL_LOGS} />
-        </main>
-        <MissionPanel />
+    <GameProvider>
+      <div className="app-root">
+        <GameRouter />
       </div>
-    </div>
+    </GameProvider>
   )
 }
+
+export default App

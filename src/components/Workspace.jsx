@@ -1,16 +1,50 @@
-import { FormPanel } from './FormPanel'
-import { InspectPanel } from './InspectPanel'
-import { LogPanel } from './LogPanel'
+import { FormView } from './FormView'
+import { LogView } from './LogView'
+import { InspectMode } from './InspectMode'
+import { FinalChoice } from './FinalChoice'
 
-export function Workspace({ activeView, logs }) {
+const TABS = [
+  { id: 'form', label: 'FORM' },
+  { id: 'log', label: 'LOG' },
+  { id: 'inspect', label: 'INSPECT' },
+]
+
+export function Workspace({
+  activeView,
+  onTabChange,
+  serverLogs,
+  currentDay,
+  dayPhase,
+  onMiniComplete,
+  onGhostSeen,
+  onBlockedSeen,
+  onFinalChoice,
+  onFinalMistake,
+}) {
   return (
-    <main className="workspace">
-      <div className="tabs"><button className="tab active">{activeView.toUpperCase()}</button></div>
-      <section className="panel">
-        {activeView === 'form' && <FormPanel />}
-        {activeView === 'log' && <LogPanel logs={logs} />}
-        {activeView === 'inspect' && <InspectPanel />}
-      </section>
-    </main>
+    <div className="workspace" data-highlight="console">
+      <div className="workspace-tabs">
+        {TABS.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            className={`workspace-tab tab-${t.id} ${activeView === t.id ? 'active' : ''}`}
+            onClick={() => onTabChange(t.id)}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+      <div className="workspace-body">
+        {currentDay === 5 && dayPhase === 'play' && (
+          <FinalChoice onChoose={onFinalChoice} onMistake={onFinalMistake} />
+        )}
+        {activeView === 'form' && <FormView />}
+        {activeView === 'log' && (
+          <LogView logs={serverLogs} onGhostSeen={onGhostSeen} onBlockedSeen={onBlockedSeen} />
+        )}
+        {activeView === 'inspect' && <InspectMode onMiniComplete={onMiniComplete} />}
+      </div>
+    </div>
   )
 }
