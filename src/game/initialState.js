@@ -36,5 +36,7 @@ export function createInitialState() {
     guideStep: 0,
     notifications: [],
     uiPanel: null,
+    tutorialSeen: false,
+    tutorialStep: 0,
   }
 }

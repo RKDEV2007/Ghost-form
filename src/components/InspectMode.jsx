@@ -3,6 +3,72 @@ import { useGame } from '../game/useGame'
 import { addNotification } from '../game/notifications'
 import { applyStatEvent } from '../game/stats'
 
+const TUTORIAL_STARTER = `<form action="/submit" method="POST">
+  <!-- добавь поле ввода здесь -->
+  <button type="submit">Отправить</button>
+</form>`
+
+function validateTutorial(code) {
+  return /<input/i.test(code) && /name\s*=/i.test(code)
+}
+
+export function TutorialInspect({ onDone }) {
+  const [code, setCode] = useState(TUTORIAL_STARTER)
+  const [status, setStatus] = useState('')
+  const [done, setDone] = useState(false)
+
+  const check = () => {
+    if (done) return
+    if (!validateTutorial(code)) {
+      setStatus('Не хватает тега <input> с атрибутом name=. Попробуй ещё раз.')
+      return
+    }
+    setStatus('Верно! Поле добавлено.')
+    setDone(true)
+    setTimeout(onDone, 800)
+  }
+
+  return (
+    <div className="inspect-console">
+      <div className="inspect-split">
+        <div className="inspect-col">
+          <span className="inspect-label">tutorial · попробуй Inspect</span>
+          <textarea
+            className="html-editor"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            rows={8}
+            spellCheck={false}
+            disabled={done}
+          />
+          <p className="inline-hint">
+            Добавь поле ввода в форму: <code>{'<input type="text" name="username" />'}</code>
+          </p>
+          <button type="button" className="action-btn" onClick={check} disabled={done}>
+            {done ? 'Готово ✓' : 'Проверить'}
+          </button>
+          {status && (
+            <p className={`inline-hint ${status.startsWith('Не') ? 'warn' : ''}`}>{status}</p>
+          )}
+        </div>
+        <div className="inspect-col">
+          <span className="inspect-label">подсказка</span>
+          <pre className="cookie-block">{`Синтаксис поля ввода:
+
+<input
+  type="text"
+  name="username"
+/>
+
+type= указывает тип поля
+name= — имя параметра,
+  которое придёт на сервер`}</pre>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 const BASE_HTML = `<form action="/submit_form" method="POST">
   <input type="text" name="name" />
   <textarea name="message"></textarea>

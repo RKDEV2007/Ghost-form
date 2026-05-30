@@ -17,8 +17,16 @@ import { Workspace } from './Workspace'
 import { MiniGameComplete } from './MiniGameComplete'
 import { SettingsModal } from './SettingsModal'
 import { NotificationsPanel } from './NotificationsPanel'
+import { TutorialModal } from './TutorialModal'
 import { markAllRead } from '../game/notifications'
 import { unreadCount, addNotification } from '../game/notifications'
+
+const TUTORIAL_STEPS = {
+  1: { view: 'log',     hint: 'Открой вкладку ЛОГИ — здесь появляются все серверные запросы' },
+  2: { view: 'inspect', hint: 'Отлично! Теперь открой БРАУЗЕР (INSPECT) — тут можно редактировать код' },
+  3: { view: 'form',    hint: 'Хорошо! Открой ГЛАВНАЯ (ФОРМА) — здесь находятся формы ввода' },
+  4: { view: null,      hint: 'Последнее задание: напиши простую форму в INSPECT и нажми «Проверить»' },
+}
 
 function pickChloeSprite(dialogue, speakerYou) {
   if (speakerYou) return { src: chloeDim, dimmed: true }
@@ -40,6 +48,13 @@ export function GameScreen() {
   const notifUnread = unreadCount(state)
   const tabSwitchRef = useRef({ count: 0, ts: 0 })
 
+  const showTutorial = state.currentDay === 1 && !state.tutorialSeen && state.dayPhase === 'intro'
+  const tutorialStep = state.tutorialStep ?? 0
+  const inTutorialGuide = tutorialStep >= 1 && tutorialStep <= 4
+  const tutorialDone = tutorialStep >= 5
+  const tutorialHint = inTutorialGuide ? TUTORIAL_STEPS[tutorialStep]?.hint : null
+  const showWorkspace = inPlay || inTutorialGuide
+
   const reportGuide = useCallback(
     (action) => {
       setState((s) => tryAdvanceGuide(s, action))
@@ -51,6 +66,20 @@ export function GameScreen() {
     (view) => {
       setState((s) => {
         let next = { ...s, activeView: view }
+
+        // advance tutorial interactive guide
+        if (s.tutorialStep > 0 && s.tutorialStep <= 3) {
+          const expected = TUTORIAL_STEPS[s.tutorialStep]?.view
+          if (view === expected) {
+            const nextStep = s.tutorialStep + 1
+            // step 4 = inspect code task, auto-switch to inspect
+            if (nextStep === 4) {
+              return { ...next, tutorialStep: nextStep, activeView: 'inspect' }
+            }
+            return { ...next, tutorialStep: nextStep }
+          }
+          return next
+        }
 
         if (view !== s.activeView && (s.dayPhase === 'play' || s.dayPhase === 'mini')) {
           const now = Date.now()
@@ -200,16 +229,17 @@ export function GameScreen() {
           avatarSrc={avatar}
           notifCount={notifUnread}
           onViewChange={setView}
+          tutorialStep={tutorialStep}
         />
 
-        <main className={`game-center ${inPlay ? 'has-workspace' : 'vn-only'}`}>
+        <main className={`game-center ${showWorkspace ? 'has-workspace' : 'vn-only'}`}>
           <div className="scene" style={{ backgroundImage: `url(${background})` }}>
             <img
               src={chloe.src}
               alt="Хлоя"
               className={`character ${chloe.dimmed ? 'dimmed' : ''}`}
             />
-            {inIntro && currentLine && (
+            {inIntro && currentLine && !showTutorial && !inTutorialGuide && (
               <DialogueBox
                 key={`${state.currentDay}-${state.dialogueIndex}`}
                 dialogue={currentLine}
@@ -218,7 +248,7 @@ export function GameScreen() {
             )}
           </div>
 
-          {inPlay && (
+          {showWorkspace && (
             <Workspace
               activeView={state.activeView}
               onTabChange={setView}
@@ -237,6 +267,8 @@ export function GameScreen() {
               }}
               onFinalChoice={finalChoice}
               onFinalMistake={() => setState((s) => applyStatEvent(s, 'mistake'))}
+              tutorialStep={tutorialStep}
+              onTutorialInspectDone={() => setState({ tutorialStep: 5 })}
             />
           )}
         </main>
@@ -276,6 +308,27 @@ export function GameScreen() {
           onNextDay={nextDay}
           isLast={state.currentDay >= 5}
         />
+      )}
+
+      {showTutorial && (
+        <TutorialModal
+          onStart={() =>
+            setState({ tutorialSeen: true, tutorialStep: 1, activeView: 'log' })
+          }
+        />
+      )}
+
+      {inTutorialGuide && tutorialHint && (
+        <div className="tutorial-hint-bar">
+          <span className="tutorial-hint-step">{tutorialStep}/4</span>
+          <span className="tutorial-hint-text">{tutorialHint}</span>
+        </div>
+      )}
+
+      {tutorialDone && state.dayPhase === 'intro' && (
+        <div className="tutorial-done-badge">
+          Отлично! Ты знаешь интерфейс. Читай диалог Хлои наверху и жми <strong>СТАРТ!</strong>
+        </div>
       )}
     </div>
   )

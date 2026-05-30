@@ -9,24 +9,30 @@ const NAV = [
   { id: 'journal', label: 'ЖУРНАЛ', icon: '☰', view: null, badge: '!!!' },
 ]
 
-export function Sidebar({ activeView, inPlay, stats, username, onViewChange, avatarSrc, notifCount }) {
+const TUTORIAL_VIEW = { 1: 'log', 2: 'inspect', 3: 'form' }
+
+export function Sidebar({ activeView, inPlay, stats, username, onViewChange, avatarSrc, notifCount, tutorialStep }) {
   const safeStats = normalizeStats(stats)
   const xpPct = Math.round((safeStats.xp / 1000) * 100)
+  const tutorialActive = tutorialStep > 0 && tutorialStep <= 3
+  const tutorialTargetView = TUTORIAL_VIEW[tutorialStep] ?? null
 
   return (
     <aside className="sidebar left">
       <nav className="sidebar-nav">
         {NAV.map((item) => {
-          const active = inPlay && item.view === activeView
-          const introLogs = !inPlay && item.id === 'logs'
+          const active = (inPlay || tutorialActive) && item.view === activeView
+          const introLogs = !inPlay && !tutorialActive && item.id === 'logs'
+          const isTutorialHighlight = tutorialActive && item.view === tutorialTargetView
+          const canClick = item.view && (inPlay || (tutorialActive && item.view === tutorialTargetView))
           return (
             <button
               key={item.id}
               type="button"
               data-nav={item.id}
-              className={`nav-item ${active || introLogs ? 'active' : ''}`}
-              disabled={!item.view || !inPlay}
-              onClick={() => item.view && inPlay && onViewChange(item.view)}
+              className={`nav-item ${active || introLogs ? 'active' : ''} ${isTutorialHighlight ? 'tutorial-highlight' : ''}`}
+              disabled={!canClick}
+              onClick={() => canClick && onViewChange(item.view)}
             >
               <span className="nav-icon">{item.icon}</span>
               <span className="nav-label">{item.label}</span>

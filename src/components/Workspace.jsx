@@ -1,6 +1,6 @@
 import { FormView } from './FormView'
 import { LogView } from './LogView'
-import { InspectMode } from './InspectMode'
+import { InspectMode, TutorialInspect } from './InspectMode'
 import { FinalChoice } from './FinalChoice'
 
 const TABS = [
@@ -20,7 +20,11 @@ export function Workspace({
   onBlockedSeen,
   onFinalChoice,
   onFinalMistake,
+  tutorialStep,
+  onTutorialInspectDone,
 }) {
+  const isTutorialInspect = tutorialStep === 4
+
   return (
     <div className="workspace" data-highlight="console">
       <div className="workspace-tabs">
@@ -43,7 +47,12 @@ export function Workspace({
         {activeView === 'log' && (
           <LogView logs={serverLogs} onGhostSeen={onGhostSeen} onBlockedSeen={onBlockedSeen} />
         )}
-        {activeView === 'inspect' && <InspectMode onMiniComplete={onMiniComplete} />}
+        {activeView === 'inspect' && isTutorialInspect && (
+          <TutorialInspect onDone={onTutorialInspectDone} />
+        )}
+        {activeView === 'inspect' && !isTutorialInspect && (
+          <InspectMode onMiniComplete={onMiniComplete} />
+        )}
       </div>
     </div>
   )
