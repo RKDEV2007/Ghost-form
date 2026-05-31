@@ -18,6 +18,7 @@ import { MiniGameComplete } from './MiniGameComplete'
 import { SettingsModal } from './SettingsModal'
 import { NotificationsPanel } from './NotificationsPanel'
 import { TutorialModal } from './TutorialModal'
+import { InstructionModal } from './InstructionModal'
 import { markAllRead } from '../game/notifications'
 import { unreadCount, addNotification } from '../game/notifications'
 
@@ -48,7 +49,17 @@ export function GameScreen() {
   const notifUnread = unreadCount(state)
   const tabSwitchRef = useRef({ count: 0, ts: 0 })
 
-  const showTutorial = state.currentDay === 1 && !state.tutorialSeen && state.dayPhase === 'intro'
+  const showInstruction =
+    state.uiPanel === 'instruction' ||
+    (state.currentDay === 1 && !state.instructionSeen && state.dayPhase === 'intro')
+  const instructionFirstView = !state.instructionSeen
+
+  const showTutorial =
+    state.currentDay === 1 &&
+    !state.tutorialSeen &&
+    state.instructionSeen &&
+    state.dayPhase === 'intro' &&
+    !showInstruction
   const tutorialStep = state.tutorialStep ?? 0
   const inTutorialGuide = tutorialStep >= 1 && tutorialStep <= 4
   const tutorialDone = state.currentDay === 1 && tutorialStep >= 5
@@ -193,6 +204,13 @@ export function GameScreen() {
     })
   }
 
+  const closeInstruction = () => {
+    setState((s) => ({
+      instructionSeen: true,
+      uiPanel: s.uiPanel === 'instruction' ? null : s.uiPanel,
+    }))
+  }
+
   const finalChoice = (choice) => {
     const statMap = {
       delete: 'final_delete',
@@ -220,6 +238,7 @@ export function GameScreen() {
         unreadCount={notifUnread}
         onNotifications={() => setState({ uiPanel: 'notifications' })}
         onSettings={() => setState({ uiPanel: 'settings' })}
+        onInstruction={() => setState({ uiPanel: 'instruction' })}
       />
       <div className="game-body">
         <Sidebar
@@ -240,7 +259,7 @@ export function GameScreen() {
               alt="Хлоя"
               className={`character ${chloe.dimmed ? 'dimmed' : ''}`}
             />
-            {inIntro && currentLine && !showTutorial && !inTutorialGuide && (
+            {inIntro && currentLine && !showTutorial && !inTutorialGuide && !showInstruction && (
               <DialogueBox
                 key={`${state.currentDay}-${state.dialogueIndex}`}
                 dialogue={currentLine}
@@ -309,6 +328,10 @@ export function GameScreen() {
           onNextDay={nextDay}
           isLast={state.currentDay >= 5}
         />
+      )}
+
+      {showInstruction && (
+        <InstructionModal onClose={closeInstruction} isFirstView={instructionFirstView} />
       )}
 
       {showTutorial && (

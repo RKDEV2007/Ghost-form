@@ -39,6 +39,7 @@ export function GameHeader({
   unreadCount = 0,
   onNotifications,
   onSettings,
+  onInstruction,
 }) {
   const safeStats = normalizeStats(stats)
   const [hint, setHint] = useState(null)
@@ -120,6 +121,10 @@ export function GameHeader({
       </div>
 
       <div className="header-utils">
+        <button type="button" className="util-btn util-btn-instruction" onClick={onInstruction}>
+          ?
+          ИНСТРУКЦИЯ
+        </button>
         <button type="button" className="util-btn" onClick={onNotifications}>
           <img src={bellIcon} alt="" />
           УВЕДОМЛЕНИЯ

@@ -38,5 +38,6 @@ export function createInitialState() {
     uiPanel: null,
     tutorialSeen: false,
     tutorialStep: 0,
+    instructionSeen: false,
   }
 }

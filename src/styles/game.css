@@ -1722,3 +1722,182 @@ body {
   from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
   to   { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
+
+/* ─── INSTRUCTION MODAL ─── */
+.instruction-overlay {
+  z-index: 210;
+}
+
+.instruction-modal {
+  border-color: var(--green);
+  box-shadow: 0 0 60px rgba(212, 255, 94, 0.2);
+  max-width: 960px;
+}
+
+.instruction-name-badge {
+  margin-top: 8px;
+  background: var(--green);
+  color: #111;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  padding: 4px 14px;
+  border-radius: 3px;
+}
+
+.instruction-tag {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--green);
+  font-weight: 700;
+}
+
+.instruction-content {
+  gap: 14px;
+}
+
+.instruction-block-title {
+  margin: 4px 0 0;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--green);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.instruction-section {
+  border-color: #1e2838;
+}
+
+.instruction-section:hover {
+  border-color: var(--green);
+}
+
+.instruction-steps {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.instruction-steps li {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.instruction-days {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px;
+}
+
+.instruction-day {
+  background: #0d1118;
+  border: 1px solid #252b38;
+  border-radius: 4px;
+  padding: 10px 12px;
+}
+
+.instruction-day-num {
+  display: block;
+  font-size: 10px;
+  color: var(--pink);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+
+.instruction-day strong {
+  display: block;
+  font-size: 12px;
+  color: var(--green);
+  margin-bottom: 4px;
+}
+
+.instruction-day p {
+  margin: 0;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.instruction-terms {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.instruction-term {
+  background: #0d1118;
+  border-left: 3px solid var(--green);
+  padding: 8px 12px;
+  border-radius: 0 4px 4px 0;
+}
+
+.instruction-term dt {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.instruction-term dd {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.instruction-close-btn {
+  align-self: flex-end;
+  background: var(--green);
+  color: #111;
+  border: none;
+  border-radius: 4px;
+  padding: 12px 28px;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  margin-top: 4px;
+}
+
+.instruction-close-btn:hover {
+  background: #c4ef4e;
+  transform: translateY(-1px);
+}
+
+.util-btn-instruction {
+  border-color: var(--green);
+  background: #eef9c8;
+  font-size: 9px;
+}
+
+.util-btn-instruction:hover {
+  background: var(--green);
+  border-color: #111;
+}
+
+@media (max-width: 720px) {
+  .instruction-modal {
+    flex-direction: column;
+    max-height: 92vh;
+  }
+
+  .tutorial-portrait {
+    flex: 0 0 auto;
+    flex-direction: row;
+    padding: 12px;
+    border-right: none;
+    border-bottom: 2px solid #2a2f3a;
+  }
+
+  .tutorial-chloe {
+    max-width: 80px;
+    margin-top: 0;
+  }
+}
