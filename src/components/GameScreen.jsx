@@ -51,7 +51,7 @@ export function GameScreen() {
   const showTutorial = state.currentDay === 1 && !state.tutorialSeen && state.dayPhase === 'intro'
   const tutorialStep = state.tutorialStep ?? 0
   const inTutorialGuide = tutorialStep >= 1 && tutorialStep <= 4
-  const tutorialDone = tutorialStep >= 5
+  const tutorialDone = state.currentDay === 1 && tutorialStep >= 5
   const tutorialHint = inTutorialGuide ? TUTORIAL_STEPS[tutorialStep]?.hint : null
   const showWorkspace = inPlay || inTutorialGuide
 
@@ -185,6 +185,7 @@ export function GameScreen() {
       dialogueIndex: 0,
       introComplete: false,
       guideStep: 0,
+      tutorialStep: 0,
       activeView: 'log',
       missionTasks: cfg.tasks,
       completedTasks: [],
